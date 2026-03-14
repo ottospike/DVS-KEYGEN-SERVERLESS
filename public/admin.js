@@ -15,7 +15,7 @@ async function fetchSubs(silent) {
         subs = d.subscriptions || [];
         renderStats();
         renderTable();
-    } catch (err) { if (!silent) showToast('Failed: ' + err.message, 'error'); }
+    } catch (err) { if (!silent) showToast('Falhou: ' + err.message, 'error'); }
 }
 
 function renderStats() {
@@ -30,18 +30,18 @@ function renderStats() {
 
 function renderTable() {
     const c = document.getElementById('subs-container');
-    if (!subs.length) { c.innerHTML = '<div class="empty-state"><h3>No subscriptions yet</h3><p>Add one above</p></div>'; return; }
+    if (!subs.length) { c.innerHTML = '<div class="empty-state"><h3>Nenhuma assinatura ainda</h3><p>Adicione uma acima</p></div>'; return; }
     const now = new Date(), soon = new Date(now.getTime() + 86400000);
     const rows = subs.map(s => {
         const exp = new Date(s.expiresAt), sub = new Date(s.subscribedAt);
-        let sc = 'active', st = 'Active';
-        if (exp <= now) { sc = 'expired'; st = 'Expired'; } else if (exp <= soon) { sc = 'expiring-soon'; st = 'Expiring Soon'; }
+        let sc = 'active', st = 'Ativa';
+        if (exp <= now) { sc = 'expired'; st = 'Expirada'; } else if (exp <= soon) { sc = 'expiring-soon'; st = 'Expirando em Breve'; }
         const diff = exp - now;
-        let tl = 'Expired';
+        let tl = 'Expirada';
         if (diff > 0) { const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000); tl = d > 0 ? d+'d '+h+'h' : h > 0 ? h+'h '+m+'m' : m+'m'; }
-        return '<tr><td><strong>'+s.email+'</strong></td><td>'+s.quantity+'</td><td>'+sub.toLocaleString()+'</td><td>'+exp.toLocaleString()+'<br><small style="color:#999">'+tl+'</small></td><td><span class="status '+sc+'">'+st+'</span></td><td><div class="actions"><button class="success" onclick="sendKeys(\''+s.email+'\')">Send Keys</button><button class="secondary" onclick="editSub(\''+s.email+'\')">Edit</button><button class="danger" onclick="deleteSub(\''+s.email+'\')">Delete</button></div></td></tr>';
+        return '<tr><td><strong>'+s.email+'</strong></td><td>'+s.quantity+'</td><td>'+sub.toLocaleString()+'</td><td>'+exp.toLocaleString()+'<br><small style="color:#999">'+tl+'</small></td><td><span class="status '+sc+'">'+st+'</span></td><td><div class="actions"><button class="success" onclick="sendKeys(\''+s.email+'\')">Enviar Chaves</button><button class="secondary" onclick="editSub(\''+s.email+'\')">Editar</button><button class="danger" onclick="deleteSub(\''+s.email+'\')">Excluir</button></div></td></tr>';
     }).join('');
-    c.innerHTML = '<table><thead><tr><th>Email</th><th>Keys</th><th>Subscribed</th><th>Expires</th><th>Status</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    c.innerHTML = '<table><thead><tr><th>E-mail</th><th>Chaves</th><th>Assinado em</th><th>Expira em</th><th>Status</th><th>Ações</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 document.getElementById('subscribe-form').addEventListener('submit', async e => {
@@ -50,12 +50,12 @@ document.getElementById('subscribe-form').addEventListener('submit', async e => 
     try {
         const r = await fetch('/api/subscriptions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, quantity: qty }) });
         const d = await r.json();
-        if (r.ok) { showToast('Added', 'success'); e.target.reset(); fetchSubs(true); } else showToast(d.error, 'error');
+        if (r.ok) { showToast('Adicionada', 'success'); e.target.reset(); fetchSubs(true); } else showToast(d.error, 'error');
     } catch (err) { showToast(err.message, 'error'); }
 });
 
 async function sendKeys(email) {
-    showToast('Generating keys for ' + email + '...', 'info');
+    showToast('Gerando chaves para ' + email + '...', 'info');
     try {
         const r = await fetch('/api/send-subscription?email=' + encodeURIComponent(email), { method: 'POST' });
         const d = await r.json();
@@ -76,15 +76,15 @@ document.getElementById('edit-form').addEventListener('submit', async e => {
     const email = document.getElementById('edit-email').value, qty = parseInt(document.getElementById('edit-quantity').value);
     try {
         const r = await fetch('/api/subscriptions?email=' + encodeURIComponent(email), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quantity: qty }) });
-        if (r.ok) { showToast('Updated', 'success'); document.getElementById('edit-modal').classList.remove('active'); fetchSubs(true); } else { const d = await r.json(); showToast(d.error, 'error'); }
+        if (r.ok) { showToast('Atualizada', 'success'); document.getElementById('edit-modal').classList.remove('active'); fetchSubs(true); } else { const d = await r.json(); showToast(d.error, 'error'); }
     } catch (err) { showToast(err.message, 'error'); }
 });
 
 async function deleteSub(email) {
-    if (!confirm('Delete subscription for ' + email + '?')) return;
+    if (!confirm('Excluir assinatura de ' + email + '?')) return;
     try {
         const r = await fetch('/api/subscriptions?email=' + encodeURIComponent(email), { method: 'DELETE' });
-        if (r.ok) { showToast('Deleted', 'success'); fetchSubs(true); } else { const d = await r.json(); showToast(d.error, 'error'); }
+        if (r.ok) { showToast('Excluída', 'success'); fetchSubs(true); } else { const d = await r.json(); showToast(d.error, 'error'); }
     } catch (err) { showToast(err.message, 'error'); }
 }
 

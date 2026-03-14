@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,51 +10,54 @@
     <div class="container">
         <div class="header">
             <h1>DVS Keygen</h1>
-            <p>Generate Dante Virtual Soundcard license keys</p>
-            <nav class="nav-links"><a href="/admin">Subscriptions</a></nav>
+            <p>Gere chaves de licença do Dante Virtual Soundcard</p>
+            <nav class="nav-links"><a href="/admin">Assinaturas</a></nav>
         </div>
 
         <div class="section">
-            <h2>Generate Keys</h2>
+            <h2>Gerar Chaves</h2>
             <form id="generate-form">
                 <div class="form-group">
-                    <label for="quantity">Number of Keys</label>
+                    <label for="quantity">Quantidade de Chaves</label>
                     <input type="number" id="quantity" min="1" max="100" value="3" required>
                 </div>
-                <button type="submit" id="gen-btn">Generate Keys</button>
+                <button type="submit" id="gen-btn">Gerar Chaves</button>
             </form>
             <div id="result-box" class="result-box">
-                <div class="result-header"><h3>Generated Keys</h3><span id="result-stats"></span></div>
+                <div class="result-header"><h3>Chaves Geradas</h3><span id="result-stats"></span></div>
                 <div id="key-list" class="key-list"></div>
             </div>
         </div>
 
         <div class="section">
-            <h2>Generate & Email</h2>
+            <h2>Gerar & Enviar por E-mail</h2>
             <form id="send-form">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="send-email">Recipient Email</label>
-                        <input type="email" id="send-email" placeholder="user@example.com" required>
+                        <label for="send-email">E-mail do Destinatário</label>
+                        <input type="email" id="send-email" placeholder="usuario@exemplo.com" required>
                     </div>
                     <div class="form-group">
-                        <label for="send-qty">Number of Keys</label>
+                        <label for="send-qty">Quantidade de Chaves</label>
                         <input type="number" id="send-qty" min="1" max="50" value="3" required>
                     </div>
                 </div>
-                <button type="submit" id="send-btn">Generate & Send</button>
+                <button type="submit" id="send-btn">Gerar & Enviar</button>
             </form>
         </div>
     </div>
+    <footer style="text-align:center;padding:20px 0 10px;color:#888;font-size:0.85rem;">
+        powered by: TATAFODAO, ETERNO DEUS DO BROADCAST
+    </footer>
     <div id="toast-container"></div>
     <script>
         function showToast(m,t='info'){const c=document.getElementById('toast-container'),e=document.createElement('div');e.className='toast toast-'+t;e.innerHTML='<div class="toast-content"><span>'+m+'</span><button class="toast-close" onclick="this.parentElement.parentElement.remove()">&times;</button></div>';c.appendChild(e);setTimeout(()=>{e.style.animation='slideOut 0.3s ease forwards';setTimeout(()=>e.remove(),300)},4000)}
 
-        document.getElementById('generate-form').addEventListener('submit',async e=>{e.preventDefault();const q=parseInt(document.getElementById('quantity').value),b=document.getElementById('gen-btn'),rb=document.getElementById('result-box'),kl=document.getElementById('key-list'),st=document.getElementById('result-stats');b.disabled=true;b.textContent='Generating...';rb.classList.remove('show');try{const r=await fetch('/api/generate-keys',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({quantity:q})});const d=await r.json();if(r.ok&&d.keys){kl.innerHTML=d.keys.map((k,i)=>'<div class="key-item"><span>'+(i+1)+'. '+k.code+'</span><button class="copy-btn" data-key="'+k.code+'">Copy</button></div>').join('');st.textContent=d.stats.success+'/'+d.stats.total+' in '+d.stats.elapsedTime;rb.classList.add('show');showToast('Generated '+d.keys.length+' key(s)','success')}else showToast(d.error||'Failed','error')}catch(err){showToast(err.message,'error')}finally{b.disabled=false;b.textContent='Generate Keys'}});
+        document.getElementById('generate-form').addEventListener('submit',async e=>{e.preventDefault();const q=parseInt(document.getElementById('quantity').value),b=document.getElementById('gen-btn'),rb=document.getElementById('result-box'),kl=document.getElementById('key-list'),st=document.getElementById('result-stats');b.disabled=true;b.textContent='Gerando...';rb.classList.remove('show');try{const r=await fetch('/api/generate-keys',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({quantity:q})});const d=await r.json();if(r.ok&&d.keys){kl.innerHTML=d.keys.map((k,i)=>'<div class="key-item"><span>'+(i+1)+'. '+k.code+'</span><button class="copy-btn" data-key="'+k.code+'">Copiar</button></div>').join('');st.textContent=d.stats.success+'/'+d.stats.total+' em '+d.stats.elapsedTime;rb.classList.add('show');showToast('Geradas '+d.keys.length+' chave(s)','success')}else showToast(d.error||'Falhou','error')}catch(err){showToast(err.message,'error')}finally{b.disabled=false;b.textContent='Gerar Chaves'}});
 
-        document.getElementById('key-list').addEventListener('click',e=>{if(e.target.classList.contains('copy-btn'))navigator.clipboard.writeText(e.target.dataset.key).then(()=>showToast('Copied!','success'))});
+        document.getElementById('key-list').addEventListener('click',e=>{if(e.target.classList.contains('copy-btn'))navigator.clipboard.writeText(e.target.dataset.key).then(()=>showToast('Copiado!','success'))});
 
-        document.getElementById('send-form').addEventListener('submit',async e=>{e.preventDefault();const em=document.getElementById('send-email').value,q=parseInt(document.getElementById('send-qty').value),b=document.getElementById('send-btn');b.disabled=true;b.textContent='Generating & sending...';showToast('Generating '+q+' key(s) for '+em+'...','info');try{const r=await fetch('/api/send-keys',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,quantity:q})});const d=await r.json();showToast(r.ok?d.message:d.error,r.ok?'success':'error')}catch(err){showToast(err.message,'error')}finally{b.disabled=false;b.textContent='Generate & Send'}});
+        document.getElementById('send-form').addEventListener('submit',async e=>{e.preventDefault();const em=document.getElementById('send-email').value,q=parseInt(document.getElementById('send-qty').value),b=document.getElementById('send-btn');b.disabled=true;b.textContent='Gerando & enviando...';showToast('Gerando '+q+' chave(s) para '+em+'...','info');try{const r=await fetch('/api/send-keys',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,quantity:q})});const d=await r.json();showToast(r.ok?d.message:d.error,r.ok?'success':'error')}catch(err){showToast(err.message,'error')}finally{b.disabled=false;b.textContent='Gerar & Enviar'}});
     </script>
 </body>
 </html>
