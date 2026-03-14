@@ -1,14 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/generate-keys.js": { "maxDuration": 60, "memory": 1024 },
-    "api/send-keys.js": { "maxDuration": 60, "memory": 1024 },
-    "api/send-subscription.js": { "maxDuration": 60, "memory": 1024 },
-    "api/cron-renew.js": { "maxDuration": 60, "memory": 1024 }
-  },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/public/$1" }
-  ],
   "crons": [
     { "path": "/api/cron-renew", "schedule": "0 0 * * *" }
   ]
