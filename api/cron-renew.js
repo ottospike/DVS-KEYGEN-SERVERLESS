@@ -8,6 +8,7 @@ const SUBSCRIPTION_DAYS = parseInt(process.env.SUBSCRIPTION_DAYS || '28', 10);
 const DURATION_MS = SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000;
 
 module.exports = async (req, res) => {
+    try {
     // Optional: protect with a secret so only Vercel cron or you can trigger it
     const secret = process.env.CRON_SECRET;
     if (secret && req.headers.authorization !== `Bearer ${secret}`) {
@@ -41,4 +42,8 @@ module.exports = async (req, res) => {
     }
 
     res.json({ message: `Processed ${expired.length} subscription(s)`, renewed: results.filter(r => r.status === 'renewed').length, results });
+    } catch (err) {
+        console.error('cron-renew error:', err);
+        res.status(500).json({ error: err.message || 'Internal server error' });
+    }
 };

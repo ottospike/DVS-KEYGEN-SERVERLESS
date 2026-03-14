@@ -6,6 +6,7 @@ const SUBSCRIPTION_DAYS = parseInt(process.env.SUBSCRIPTION_DAYS || '28', 10);
 const DURATION_MS = SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000;
 
 module.exports = async (req, res) => {
+    try {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
     const email = req.query.email || req.body.email;
@@ -37,4 +38,8 @@ module.exports = async (req, res) => {
         message: `Sent ${keys.length} key(s) to ${email}`,
         elapsedTime: `${((Date.now() - startTime) / 1000).toFixed(2)}s`,
     });
+    } catch (err) {
+        console.error('send-subscription error:', err);
+        res.status(500).json({ error: err.message || 'Internal server error' });
+    }
 };
