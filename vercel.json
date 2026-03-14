@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "public/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/generate-keys", "dest": "/api/generate-keys.js" },
+    { "src": "/api/send-keys", "dest": "/api/send-keys.js" },
+    { "src": "/api/subscriptions", "dest": "/api/subscriptions.js" },
+    { "src": "/api/send-subscription", "dest": "/api/send-subscription.js" },
+    { "src": "/api/cron-renew", "dest": "/api/cron-renew.js" },
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ],
+  "functions": {
+    "api/generate-keys.js": { "maxDuration": 60, "memory": 1024 },
+    "api/send-keys.js": { "maxDuration": 60, "memory": 1024 },
+    "api/send-subscription.js": { "maxDuration": 60, "memory": 1024 },
+    "api/cron-renew.js": { "maxDuration": 60, "memory": 1024 }
+  },
+  "crons": [
+    { "path": "/api/cron-renew", "schedule": "0 * * * *" }
+  ]
+}
